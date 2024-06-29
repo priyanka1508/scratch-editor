@@ -1,11 +1,10 @@
 import React, { Fragment, useState } from "react";
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Icon from "../../Icon";
 import QueueAction from "../../actions";
 
 function getRotationAngle(elementId) {
   const element = document.getElementById(elementId);
-  
   if (!element) {
     return null;
   }
@@ -20,7 +19,6 @@ function getRotationAngle(elementId) {
 
   // Extract the values from the matrix
   const matrixValues = transform.match(/matrix.*\((.+)\)/);
-  
   if (!matrixValues) {
     console.error('No valid transform matrix found');
     return null;
@@ -38,6 +36,9 @@ function getRotationAngle(elementId) {
 
 export const moveSprite = (steps) => {
   const el = document.getElementById("character0-0");
+  if (!el) {
+    return;
+  }
   const container = el.parentElement.parentElement;
   const elWidth = el.offsetWidth;
   const containerWidth = container.offsetWidth;
@@ -53,26 +54,39 @@ export const moveSprite = (steps) => {
 
 export const turnSprite = (degree, direction) => {
   const el = document.getElementById("character0-0");
-  const rotation = getRotationAngle('character0-0');
+  if (!el) {
+    return;
+  }
+  let rotation = getRotationAngle('character0-0');
+  console.log("curret rotation: ", rotation);
   let newRotation;
-  if(direction==="left"){
+  if (direction === "left") {
     newRotation = rotation - Number(degree);
-  }else{
+  } else {
     newRotation = rotation + Number(degree);
   }
   el.style.transform = `rotate(${newRotation}deg)`;
 }
 
-export const glideSprite = (randomOffset, glideTime) => {
+export const glideSprite = (randomOffsetX, randomOffsetY, glideTime) => {
   const el = document.getElementById("character0-0");
+  if (!el) {
+    console.log("el not exists: ");
+    return;
+  }
   const container = el.parentElement.parentElement;
   const containerWidth = container.offsetWidth;
   const containerHeight = container.offsetHeight;
 
-  const x = randomOffset * (containerWidth - el.offsetWidth);
-  const y = randomOffset * (containerHeight - el.offsetHeight);
+  const x = (randomOffsetX) * (containerWidth - el.offsetWidth);
+  const y = (randomOffsetY) * (containerHeight - el.offsetHeight);
 
   el.style.position = "absolute";
+  el.style.left = `${el.offsetLeft}px`;
+  el.style.top = `${el.offsetTop}px`;
+  el.offsetHeight; 
+
+  // Apply transition styles
   el.style.transition = `all ${glideTime}s ease-in-out`;
   el.style.left = `${x}px`;
   el.style.top = `${y}px`;
@@ -90,7 +104,7 @@ const MotionSection = () => {
 
   const handleClick = () => {
     dispatch(QueueAction("ENQUEUE", `move_right ${moveSteps}`));
-    moveSprite(moveSteps)
+    moveSprite(moveSteps);
   };
 
   const handleMoveSteps = (e) => {
@@ -108,9 +122,10 @@ const MotionSection = () => {
   };
 
   const handleGlide = () => {
-    const randomOffset = Math.random()
-    dispatch(QueueAction("ENQUEUE", `glide ${randomOffset}_${glideTime}`));
-    glideSprite(randomOffset, glideTime);
+    const randomOffsetX = Math.random();
+    const randomOffsetY = Math.random();
+    dispatch(QueueAction("ENQUEUE", `glide ${randomOffsetX}_${randomOffsetY}_${glideTime}`));
+    glideSprite(randomOffsetX, randomOffsetY, glideTime);
   };
 
   const handleGlideTimeChange = (e) => {
@@ -130,6 +145,7 @@ const MotionSection = () => {
           <input
             value={moveSteps}
             onChange={(e) => handleMoveSteps(e)}
+            onClick={(e) => e.stopPropagation()}
             className="text-black w-8 text-center mx-2 border border-white bg-white rounded-full"
           />
         </div>
@@ -145,6 +161,7 @@ const MotionSection = () => {
           <input
             value={undoSteps}
             onChange={(e) => setUndoSteps(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
             className="text-black w-8 text-center mr-1 border border-white bg-white rounded-full"
           />
         </div>
@@ -160,6 +177,7 @@ const MotionSection = () => {
           <input
             value={redoSteps}
             onChange={(e) => setRedoSteps(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
             className="text-black w-8 text-center mr-1 border border-white bg-white rounded-full"
           />
         </div>
@@ -173,12 +191,12 @@ const MotionSection = () => {
         <input
           value={glideTime}
           onChange={handleGlideTimeChange}
+          onClick={(e) => e.stopPropagation()}
           className="text-black w-8 text-center mx-2 border border-white bg-white rounded-full"
         />
         <span>{"secs to random position"}</span>
         <span>
         </span>
-        
       </div>
     </Fragment>
   );

@@ -9,6 +9,7 @@ import {
   hideSprite,
   showSprite,
   saySprite,
+  changeSpriteSize
 } from "../SideBar/LooksSection/LookSection";
 import QueueAction from "../actions";
 import Icon from "../Icon";
@@ -28,7 +29,7 @@ const handleActionReplay = (command) => {
       break;
     case "glide":
       const args = actionValue.split("_");
-      glideSprite(Number(args[0]), Number(args[1]));
+      glideSprite(Number(args[0]), Number(args[1]), Number(args[2]));
       break;
     case "hide":
       hideSprite();
@@ -36,7 +37,8 @@ const handleActionReplay = (command) => {
     case "show":
       showSprite();
       break;
-    case "say":
+    case "changesize":
+      changeSpriteSize(actionValue);
       break;
   }
 };
@@ -62,6 +64,12 @@ const Replay = () => {
   const handleReplay = () => {
     executeCommandsWithDelay(previousActions, dispatch, 1000); // 1000ms = 1 second delay
   };
+
+  const performAction = (command) => {
+    console.log("action to perform: ", command);
+    handleActionReplay(command);
+  }
+
   return (
     <Fragment>
       <div className="font-bold"> {"Replay History"} </div>
@@ -70,7 +78,7 @@ const Replay = () => {
         onClick={handleReplay}
         style={{ backgroundColor: "#0891b2" }}
       >
-        {"Replay button"}
+        {"Replay All"}
         <Icon name="play" size={15} className="text-white mx-2 mt-1 mb-1" />
       </div>
 
@@ -79,6 +87,7 @@ const Replay = () => {
           <div
             className="flex flex-col flex-wrap text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
             style={{ backgroundColor: "#22d3ee" }}
+            onClick={()=>{performAction(action)}}
           >
             <div key={index}>{action}</div>
           </div>

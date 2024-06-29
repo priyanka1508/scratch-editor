@@ -4,6 +4,9 @@ import QueueAction from "../../actions";
 
 export const hideSprite = () => {
   const el = document.getElementById("character0-0");
+  if (!el) {
+    return;
+  }
   if (el) {
     el.style.display = "none";
   }
@@ -11,9 +14,25 @@ export const hideSprite = () => {
 
 export const showSprite = () => {
   const el = document.getElementById("character0-0");
+  if (!el) {
+    return;
+  }
   if (el) {
     el.style.display = "block";
   }
+}
+
+export const changeSpriteSize = (size) => { 
+  const el = document.getElementById("character0-0");
+  if (!el) {
+    return;
+  }
+  const currentWidth = el.offsetWidth;
+  const currentHeight = el.offsetHeight;
+  const newWidth = Number(currentWidth) + Number(size);
+  const newHeight = Number(currentHeight) + Number(size);
+  el.style.width = `${newWidth}px`;
+  el.style.height = `${newHeight}px`;
 }
 
 const LooksSection = () => {
@@ -41,30 +60,35 @@ const LooksSection = () => {
   };
 
   const handleSay = () => {
-    const isShow = !showMessage
-    setShowMessage(isShow);
+    const isShow = !showMessage;
+    //setShowMessage(isShow);
+    dispatch(QueueAction("SET_SHOW_MESSAGE", isShow));
     if (isShow) {
       //dispatch(QueueAction("ENQUEUE", `say ${message}_${manageTime}`));
-      handleSay(isShow);
       const el = document.getElementById("character0-0");
       if (el) {
         const rect = el.getBoundingClientRect();
-        setBubblePosition({
+        const bubblePos = {
           top: rect.top - 30, // Adjust the position above the cat
           left: rect.left + rect.width / 2, // Center horizontally
           show: "block"
-        });
+        }
+        //setBubblePosition(bubblePos);
+        dispatch(QueueAction("SET_BUBBLE_POSITION", bubblePos));
       }
 
       const timer = setTimeout(() => {
         const el = document.getElementById("character0-0");
         const rect = el.getBoundingClientRect();
-        setShowMessage(!isShow);
-        setBubblePosition({
+        //setShowMessage(!isShow);
+        dispatch(QueueAction("SET_SHOW_MESSAGE", !isShow));
+        const bubblePos = {
           top: rect.top - 30, // Adjust the position above the cat
           left: rect.left + rect.width / 2, // Center horizontally
           show: "none"
-        });
+        }
+        //setBubblePosition(bubblePos);
+        dispatch(QueueAction("SET_BUBBLE_POSITION", bubblePos));
       }, manageTime * 1000);
 
       return () => clearTimeout(timer);
@@ -78,10 +102,9 @@ const LooksSection = () => {
     if (el) {
       const currentWidth = el.offsetWidth;
       const currentHeight = el.offsetHeight;
-
+      
       const newWidth = Number(currentWidth) + Number(size);
       const newHeight = Number(currentHeight) + Number(size);
-
 
       el.style.width = `${newWidth}px`;
       el.style.height = `${newHeight}px`;
@@ -90,6 +113,17 @@ const LooksSection = () => {
       console.error("Element with ID 'character0-0' not found.");
     }
   };
+
+  const handleSetMessage = (e) => {
+    dispatch(QueueAction("SET_MESSAGE", e.target.value));
+    setMessage(e.target.value);
+  }
+
+  const handleSetManageTime = (e) => {
+    // dispatch(QueueAction("SET_MANAGE_TIME", parseInt(e.target.value)));
+    console.log("event: ", e)
+    setManageTime(parseInt(e.target.value))
+  }
 
   return (
     <Fragment>
@@ -113,13 +147,15 @@ const LooksSection = () => {
         <span>{"Say"}</span>
         <input
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => handleSetMessage(e)}
+          onClick={(e) => e.stopPropagation()} 
           className="text-black w-12 text-center mx-2 border border-white bg-white rounded-full"
         />
         <span>{"for"}</span>
         <input
           value={manageTime}
-          onChange={(e) => setManageTime(parseInt(e.target.value))}
+          onChange={(e) => handleSetManageTime(e)}
+          onClick={(e) => e.stopPropagation()} 
           className="text-black w-6 text-center mx-2 border border-white bg-white rounded-full"
         />
         <span>{"seconds"}</span>
@@ -133,17 +169,10 @@ const LooksSection = () => {
           type="number"
           value={size}
           onChange={(e) => setSize(parseInt(e.target.value))}
+          onClick={(e) => e.stopPropagation()} 
           className="text-black w-12 text-center mx-2 border border-white bg-white rounded-full"
         />
       </div>
-      {showMessage && (
-        <div
-          className="absolute bg-white border border-black rounded px-2 py-1"
-          style={{ top: bubblePosition.top, left: bubblePosition.left, display: bubblePosition.show }}
-        >
-          {message}
-        </div>
-      )}
     </Fragment>
   );
 };
