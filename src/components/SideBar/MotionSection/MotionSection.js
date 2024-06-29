@@ -1,34 +1,121 @@
 import React, { Fragment, useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import Icon from "../../Icon";
+import QueueAction from "../../actions";
+
+function getRotationAngle(elementId) {
+  const element = document.getElementById(elementId);
+  
+  if (!element) {
+    return null;
+  }
+
+  const style = window.getComputedStyle(element);
+  const transform = style.transform || style.webkitTransform || style.mozTransform;
+
+  // No transform applied
+  if (transform === 'none' || !transform) {
+    return 0;
+  }
+
+  // Extract the values from the matrix
+  const matrixValues = transform.match(/matrix.*\((.+)\)/);
+  
+  if (!matrixValues) {
+    console.error('No valid transform matrix found');
+    return null;
+  }
+
+  const values = matrixValues[1].split(', ');
+  const a = parseFloat(values[0]);
+  const b = parseFloat(values[1]);
+
+  // Calculate the angle
+  const angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
+  return angle;
+}
+
+
+export const moveSprite = (steps) => {
+  const el = document.getElementById("character0-0");
+  const container = el.parentElement.parentElement;
+  const elWidth = el.offsetWidth;
+  const containerWidth = container.offsetWidth;
+  const boundary = containerWidth - elWidth;
+  const left = el.offsetLeft;
+  el.style.position = "relative";
+  const stepsToMove = Number(left) + Number(steps);
+  if (stepsToMove > boundary) {
+    return;
+  }
+  el.style.left = stepsToMove + "px";
+}
+
+export const turnSprite = (degree, direction) => {
+  const el = document.getElementById("character0-0");
+  const rotation = getRotationAngle('character0-0');
+  let newRotation;
+  if(direction==="left"){
+    newRotation = rotation - Number(degree);
+  }else{
+    newRotation = rotation + Number(degree);
+  }
+  el.style.transform = `rotate(${newRotation}deg)`;
+}
+
+export const glideSprite = (randomOffset, glideTime) => {
+  const el = document.getElementById("character0-0");
+  const container = el.parentElement.parentElement;
+  const containerWidth = container.offsetWidth;
+  const containerHeight = container.offsetHeight;
+
+  const x = randomOffset * (containerWidth - el.offsetWidth);
+  const y = randomOffset * (containerHeight - el.offsetHeight);
+
+  el.style.position = "absolute";
+  el.style.transition = `all ${glideTime}s ease-in-out`;
+  el.style.left = `${x}px`;
+  el.style.top = `${y}px`;
+}
 
 const MotionSection = () => {
   const [moveSteps, setMoveSteps] = useState(0);
   const [undoSteps, setUndoSteps] = useState(0);
   const [redoSteps, setRedoSteps] = useState(0);
+  const [rotation, setRotation] = useState(0);
+  const [glideTime, setGlideTime] = useState(1);
+
+  //const previousActions = useSelector((state) => state.previousActions);
+  const dispatch = useDispatch();
 
   const handleClick = () => {
-    const el = document.getElementById("character0-0");
-    const container = el.parentElement.parentElement;
-
-    
-    const elWidth = el.offsetWidth;
-    const containerWidth = container.offsetWidth;
-    const boundary = containerWidth - elWidth;
-    console.log("boundary: ", boundary);
-
-    const left = el.offsetLeft;
-    el.style.position = "relative";
-    const stepsToMove = Number(left) + Number(moveSteps);
-    if(stepsToMove > boundary){
-      return;
-    }
-    el.style.left = stepsToMove + "px";
+    dispatch(QueueAction("ENQUEUE", `move_right ${moveSteps}`));
+    moveSprite(moveSteps)
   };
 
   const handleMoveSteps = (e) => {
-    console.log("move by: ", e.target.value);
     setMoveSteps(e.target.value);
-  }
+  };
+
+  const handleUndoClick = () => {
+    dispatch(QueueAction("ENQUEUE", `turn_left ${undoSteps}`));
+    turnSprite(undoSteps, "left");
+  };
+
+  const handleRedoClick = () => {
+    dispatch(QueueAction("ENQUEUE", `turn_right ${redoSteps}`));
+    turnSprite(redoSteps, "right");
+  };
+
+  const handleGlide = () => {
+    const randomOffset = Math.random()
+    dispatch(QueueAction("ENQUEUE", `glide ${randomOffset}_${glideTime}`));
+    glideSprite(randomOffset, glideTime);
+  };
+
+  const handleGlideTimeChange = (e) => {
+    setGlideTime(e.target.value);
+  };
 
   return (
     <Fragment>
@@ -46,10 +133,12 @@ const MotionSection = () => {
             className="text-black w-8 text-center mx-2 border border-white bg-white rounded-full"
           />
         </div>
-
         <span>{"steps"}</span>
       </div>
-      <div className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs">
+      <div
+        className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        onClick={handleUndoClick}
+      >
         <span>{"Turn"}</span>
         <Icon name="undo" size={15} className="text-white mx-2 mt-1" />
         <div className="">
@@ -61,7 +150,10 @@ const MotionSection = () => {
         </div>
         <span>{"degrees"}</span>
       </div>
-      <div className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs">
+      <div
+        className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        onClick={handleRedoClick}
+      >
         <span>{"Turn"}</span>
         <Icon name="redo" size={15} className="text-white mx-2 mt-1" />
         <div className="">
@@ -72,6 +164,21 @@ const MotionSection = () => {
           />
         </div>
         <span>{"degrees"}</span>
+      </div>
+      <div
+        className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        onClick={handleGlide}
+      >
+        <span>{"Glide"}</span>
+        <input
+          value={glideTime}
+          onChange={handleGlideTimeChange}
+          className="text-black w-8 text-center mx-2 border border-white bg-white rounded-full"
+        />
+        <span>{"secs to random position"}</span>
+        <span>
+        </span>
+        
       </div>
     </Fragment>
   );

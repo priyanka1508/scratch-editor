@@ -1,18 +1,21 @@
 import React, { useState, useRef } from "react";
 import CatSprite from "./CatSprite";
+import Queue from "./DataStructure/Queue/Queue";
 
 const PreviewArea = () => {
   const [characters, setCharacters] = useState([{ id: "character0" }]);
+  const previousActions = new Queue();
+  previousActions.enqueue("Hello");
   const dragItem = useRef(null);
   const dragOffset = useRef({ x: 0, y: 0 });
 
   const handleMouseDown = (e, id) => {
-    console.log("id in function ",id)
     const element = document.getElementById(id);
     dragItem.current = element;
 
     const rect = element.getBoundingClientRect();
     const parentRect = element.parentElement.getBoundingClientRect();
+    const container = element.parentElement.parentElement;
     dragOffset.current = {
       x: e.clientX - rect.left + parentRect.left,
       y: e.clientY - rect.top + parentRect.top,
@@ -30,6 +33,7 @@ const PreviewArea = () => {
 
     dragItem.current.style.left = `${newX}px`;
     dragItem.current.style.top = `${newY}px`;
+    dragItem.current.style.position = 'absolute';
   };
 
   const handleMouseUp = () => {
@@ -49,7 +53,7 @@ const PreviewArea = () => {
             onMouseDown={(e) => handleMouseDown(e, `${character.id}-${i}`)}
           >
             <div id={`${character.id}-${i}`}>
-            <CatSprite charac_id={character.id} />
+            <CatSprite charac_id={character.id} style={{width : "100%", height : "100%" }} />
             </div>
           </div>
         ))}

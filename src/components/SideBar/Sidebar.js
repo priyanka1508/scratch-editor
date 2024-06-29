@@ -2,6 +2,7 @@ import React from "react";
 import Icon from "../Icon";
 import MotionSection from "./MotionSection/MotionSection";
 import LooksSection from "./LooksSection/LookSection";
+import Replay from "../Replay/Replay";
 
 export default function Sidebar() {
   return (
@@ -17,6 +18,7 @@ export default function Sidebar() {
       </div>
      <MotionSection/>
      <LooksSection/>
+     <Replay/>
     </div>
   );
 }
