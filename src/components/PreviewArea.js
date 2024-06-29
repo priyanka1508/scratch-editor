@@ -70,7 +70,7 @@ const PreviewArea = () => {
             )}
             {}
             {/* <CatSprite width={"95.17898101806641"} height={"100.04156036376953"} /> */}
-            <CatSprite width={"50%"} height={"50%"} />
+            <CatSprite />
             </div>
           </div>
         ))}

@@ -1,13 +1,14 @@
 import React from "react";
 
-export default function CatSprite({width, height}) {
+export default function CatSprite() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={width}
-      height={height}
-      // viewBox="0.3210171699523926 0.3000000357627869 95.17898101806641 100.04156036376953"
-      viewBox="0 0 100 100"
+      // width="95.17898101806641"
+      // height="100.04156036376953"
+      width="30%"
+      height="30%"
+      viewBox="0.3210171699523926 0.3000000357627869 95.17898101806641 100.04156036376953"
       version="1.1"
       xmlSpace="preserve"
     >
