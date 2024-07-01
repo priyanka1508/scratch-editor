@@ -160,7 +160,7 @@ const LooksSection = () => {
         />
         <span>{"seconds"}</span>
       </div>
-      <div
+      {/* <div
         className="flex flex-row flex-wrap bg-purple-500 text-white px-2 py-1 my-2 text-xs cursor-pointer rounded"
         onClick={changeSize}
       >
@@ -172,7 +172,7 @@ const LooksSection = () => {
           onClick={(e) => e.stopPropagation()} 
           className="text-black w-12 text-center mx-2 border border-white bg-white rounded-full"
         />
-      </div>
+      </div> */}
     </Fragment>
   );
 };
