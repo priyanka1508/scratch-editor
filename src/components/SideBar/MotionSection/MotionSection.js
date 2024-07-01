@@ -81,7 +81,8 @@ export const glideSprite = (randomOffsetX, randomOffsetY, glideTime) => {
   const x = (randomOffsetX) * (containerWidth - el.offsetWidth);
   const y = (randomOffsetY) * (containerHeight - el.offsetHeight);
 
-  el.style.position = "relative";
+  // el.style.position = "relative";
+  el.style.position = "absolute";
   el.style.left = `${el.offsetLeft}px`;
   el.style.top = `${el.offsetTop}px`;
   el.offsetHeight; 
