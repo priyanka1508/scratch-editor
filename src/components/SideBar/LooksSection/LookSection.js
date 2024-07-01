@@ -18,10 +18,10 @@ export const showSprite = () => {
   el.style.display = "block";
 }
 
-export const showMessageBubble = (showMessage, manageTime, dispatch) => {
+export const showMessageBubble = (showMessage, message, manageTime, dispatch) => {
   const isShow = !showMessage;
-    //setShowMessage(isShow);
-    dispatch(QueueAction("SET_SHOW_MESSAGE", isShow));
+  dispatch(QueueAction("SET_SHOW_MESSAGE", isShow));
+  dispatch(QueueAction("SET_MESSAGE", message));
     if (isShow) {
       //dispatch(QueueAction("ENQUEUE", `say ${message}_${manageTime}`));
       const el = document.getElementById("character0-0");
@@ -67,7 +67,7 @@ const LooksSection = () => {
     if (actionType === 'show' || actionType === 'hide') {
       e.dataTransfer.setData("value", null);
     } else if (actionType === 'say') {
-      e.dataTransfer.setData("value", `${message}_${manageTime}`);
+      e.dataTransfer.setData("value", `${message}_${showMessage}_${manageTime}`);
     }
   };
 
@@ -85,8 +85,8 @@ const LooksSection = () => {
   };
 
   const handleSay = () => {
-    showMessageBubble(showMessage, manageTime, dispatch);
-    dispatch(QueueAction("ENQUEUE", `say ${message}_${manageTime}`));
+    showMessageBubble(showMessage, message, manageTime, dispatch);
+    dispatch(QueueAction("ENQUEUE", `say ${message}_${showMessage}_${manageTime}`));
   };
 
 
@@ -97,10 +97,7 @@ const LooksSection = () => {
 
   const handleSetManageTime = (e) => {
     // dispatch(QueueAction("SET_MANAGE_TIME", parseInt(e.target.value)));
-    console.log("event: ", e.target.value)
-    console.log("type of val: ", typeof e.target.value)
     if(e.target.value == ""){
-      console.log(e)
       setManageTime(0);
       return;
     }

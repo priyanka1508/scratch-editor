@@ -37,7 +37,15 @@ const MidArea = () => {
     } else if (actionType === "turnRight") {
       turnSprite(value, "right");
       dispatch(QueueAction("ENQUEUE", `turn_right ${value}`));
-    } else if (actionType === "glide") {
+    } else if (actionType === "show") {
+      showSprite();
+      dispatch(QueueAction("ENQUEUE", `show`));
+    } 
+    else if (actionType === "hide") {
+      hideSprite();
+      dispatch(QueueAction("ENQUEUE", `hide`));
+    }
+    else if (actionType === "glide") {
       const randomOffsetX = Math.random();
       const randomOffsetY = Math.random();
       glideSprite(randomOffsetX, randomOffsetY, value);
@@ -49,7 +57,7 @@ const MidArea = () => {
       );
     } else if (actionType === "say") {
       const arg = value.split("_");
-      showMessageBubble(Number(arg[0]), Number(arg[1]), dispatch);
+      showMessageBubble(!Boolean(arg[1]), arg[0],Number(arg[2]), dispatch);
       dispatch(QueueAction("ENQUEUE", `say ${value}`));
     }
   };
@@ -66,13 +74,23 @@ const MidArea = () => {
   };
 
   const updateValueString = (valueString, index, newValue) => {
+    console.log("value in updateValueString: ", valueString);
+    console.log("index in updateValueString: ", index);
+    console.log("newvalue in updateValueString: ", newValue);
     const values = valueString.split("_");
     values[index] = newValue;
     return values.join("_");
   };
 
   const renderInputElement = (elem, index, elemIndex) => {
+    const allSplitArgs = elem.value.split("_");
     const value = elem.value.split("_")[index];
+    console.log("value in renderInput: ", value);
+    console.log("index in renderInput: ", index);
+    if(elem.actionType === "say" && index == 0) {
+        dispatch(QueueAction("SET_MESSAGE", value));
+        // setMessage(e.target.value);
+    }
     return (
       value !== "null" && (
         <div className="">
@@ -133,7 +151,7 @@ const MidArea = () => {
             {elem.actionType === "say" && (
               <div className="flex flex-row justify-evenly">
                 <span>for </span>
-                {renderInputElement(elem, 1, elemIndex)}
+                {renderInputElement(elem, 2, elemIndex)}
                 <span> seconds</span>
               </div>
             )}

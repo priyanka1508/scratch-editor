@@ -38,7 +38,7 @@ const handleActionReplay = (command, dispatch) => {
       break;
     case "say":
       const arg = actionValue.split("_");
-      showMessageBubble(Number(arg[0]), Number(arg[1]), dispatch);
+      showMessageBubble(!Boolean(arg[1]), arg[0], Number(arg[2]), dispatch);
       break;
   }
 };
@@ -66,7 +66,6 @@ const Replay = () => {
   };
 
   const performAction = (command) => {
-    console.log("action to perform: ", command);
     handleActionReplay(command, dispatch);
   }
 

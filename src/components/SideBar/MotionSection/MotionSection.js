@@ -54,7 +54,6 @@ export const turnSprite = (degree, direction) => {
     return;
   }
   let rotation = getRotationAngle('character0-0');
-  console.log("curret rotation: ", rotation);
   let newRotation;
   if (direction === "left") {
     newRotation = rotation - Number(degree);
@@ -106,7 +105,6 @@ const MotionSection = () => {
     } else if (actionType === 'glide') {
       e.dataTransfer.setData("value", glideTime);
     }
-    console.log(`Drag started with action type: ${actionType} and value: ${e.dataTransfer.getData("value")}`);
   };
   const handleClick = () => {
     dispatch(QueueAction("ENQUEUE", `move_right ${moveSteps}`));
