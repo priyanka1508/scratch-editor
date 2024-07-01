@@ -27,8 +27,7 @@ const handleActionReplay = (command, dispatch) => {
       turnSprite(actionValue, "right");
       break;
     case "glide":
-      const args = actionValue.split("_");
-      glideSprite(Number(args[0]), Number(args[1]), Number(args[2]));
+      glideSprite(Number(actionValue));
       break;
     case "hide":
       hideSprite();
@@ -48,7 +47,7 @@ function executeCommandsWithDelay(commands, dispatch, delay) {
 
   function nextCommand() {
     if (i < commands.length) {
-      handleActionReplay(commands[i]);
+      handleActionReplay(commands[i], dispatch);
       i++;
       dispatch(QueueAction("DEQUEUE", {}));
       setTimeout(nextCommand, delay);

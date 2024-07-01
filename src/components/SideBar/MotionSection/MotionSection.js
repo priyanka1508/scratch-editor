@@ -63,7 +63,7 @@ export const turnSprite = (degree, direction) => {
   el.style.transform = `rotate(${newRotation}deg)`;
 }
 
-export const glideSprite = (randomOffsetX, randomOffsetY, glideTime) => {
+export const glideSprite = (glideTime) => {
   const el = document.getElementById("character0-0");
   if (!el) {
     console.log("el not exists: ");
@@ -72,6 +72,9 @@ export const glideSprite = (randomOffsetX, randomOffsetY, glideTime) => {
   const container = el.parentElement.parentElement;
   const containerWidth = container.offsetWidth;
   const containerHeight = container.offsetHeight;
+
+  const randomOffsetX = Math.random();
+  const randomOffsetY = Math.random();
 
   const x = (randomOffsetX) * (containerWidth - el.offsetWidth);
   const y = (randomOffsetY) * (containerHeight - el.offsetHeight);
@@ -126,10 +129,8 @@ const MotionSection = () => {
   };
 
   const handleGlide = () => {
-    const randomOffsetX = Math.random();
-    const randomOffsetY = Math.random();
-    dispatch(QueueAction("ENQUEUE", `glide ${randomOffsetX}_${randomOffsetY}_${glideTime}`));
-    glideSprite(randomOffsetX, randomOffsetY, glideTime);
+    dispatch(QueueAction("ENQUEUE", `glide ${glideTime}`));
+    glideSprite(glideTime);
   };
 
   const handleGlideTimeChange = (e) => {

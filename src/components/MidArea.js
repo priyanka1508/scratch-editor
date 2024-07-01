@@ -46,13 +46,11 @@ const MidArea = () => {
       dispatch(QueueAction("ENQUEUE", `hide`));
     }
     else if (actionType === "glide") {
-      const randomOffsetX = Math.random();
-      const randomOffsetY = Math.random();
-      glideSprite(randomOffsetX, randomOffsetY, value);
+      glideSprite(Number(value));
       dispatch(
         QueueAction(
           "ENQUEUE",
-          `glide ${randomOffsetX}_${randomOffsetY}_${value}`
+          `glide ${value}`
         )
       );
     } else if (actionType === "say") {
