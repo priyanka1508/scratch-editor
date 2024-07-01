@@ -74,9 +74,6 @@ const MidArea = () => {
   };
 
   const updateValueString = (valueString, index, newValue) => {
-    console.log("value in updateValueString: ", valueString);
-    console.log("index in updateValueString: ", index);
-    console.log("newvalue in updateValueString: ", newValue);
     const values = valueString.split("_");
     values[index] = newValue;
     return values.join("_");
@@ -85,8 +82,6 @@ const MidArea = () => {
   const renderInputElement = (elem, index, elemIndex) => {
     const allSplitArgs = elem.value.split("_");
     const value = elem.value.split("_")[index];
-    console.log("value in renderInput: ", value);
-    console.log("index in renderInput: ", index);
     if(elem.actionType === "say" && index == 0) {
         dispatch(QueueAction("SET_MESSAGE", value));
         // setMessage(e.target.value);
