@@ -1,0 +1,82 @@
+/* Add this to your CSS file */
+
+.relative {
+    position: relative;
+  }
+  
+  .absolute {
+    position: absolute;
+  }
+  
+  .h-full {
+    height: 100%;
+  }
+  
+  .w-full {
+    width: 100%;
+  }
+  
+  .bg-blue-500 {
+    background-color: #4299e1;
+  }
+  
+  .text-white {
+    color: #fff;
+  }
+  
+  .px-2 {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+  
+  .py-1 {
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+  }
+  
+  .my-2 {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .cursor-pointer {
+    cursor: pointer;
+  }
+  
+  .rounded {
+    border-radius: 0.25rem;
+  }
+  
+  .items-center {
+    align-items: center;
+  }
+  
+  .text-xs {
+    font-size: 0.75rem;
+  }
+  
+  .action-block {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: #4299e1;
+    color: #fff;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    width: fit-content;
+  }
+  .action-block-look {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background-color: red;
+    color: #fff;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    width: fit-content;
+  }
+  

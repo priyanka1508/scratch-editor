@@ -12,12 +12,10 @@ function getRotationAngle(elementId) {
   const style = window.getComputedStyle(element);
   const transform = style.transform || style.webkitTransform || style.mozTransform;
 
-  // No transform applied
   if (transform === 'none' || !transform) {
     return 0;
   }
 
-  // Extract the values from the matrix
   const matrixValues = transform.match(/matrix.*\((.+)\)/);
   if (!matrixValues) {
     console.error('No valid transform matrix found');
@@ -28,11 +26,9 @@ function getRotationAngle(elementId) {
   const a = parseFloat(values[0]);
   const b = parseFloat(values[1]);
 
-  // Calculate the angle
   const angle = Math.round(Math.atan2(b, a) * (180 / Math.PI));
   return angle;
 }
-
 
 export const moveSprite = (steps) => {
   const el = document.getElementById("character0-0");
@@ -81,28 +77,37 @@ export const glideSprite = (randomOffsetX, randomOffsetY, glideTime) => {
   const x = (randomOffsetX) * (containerWidth - el.offsetWidth);
   const y = (randomOffsetY) * (containerHeight - el.offsetHeight);
 
-  // el.style.position = "relative";
   el.style.position = "absolute";
   el.style.left = `${el.offsetLeft}px`;
   el.style.top = `${el.offsetTop}px`;
   el.offsetHeight; 
 
-  // Apply transition styles
   el.style.transition = `all ${glideTime}s ease-in-out`;
   el.style.left = `${x}px`;
   el.style.top = `${y}px`;
 }
 
 const MotionSection = () => {
-  const [moveSteps, setMoveSteps] = useState(0);
-  const [undoSteps, setUndoSteps] = useState(0);
-  const [redoSteps, setRedoSteps] = useState(0);
-  const [rotation, setRotation] = useState(0);
+  const [moveSteps, setMoveSteps] = useState(10);
+  const [undoSteps, setUndoSteps] = useState(15);
+  const [redoSteps, setRedoSteps] = useState(15);
   const [glideTime, setGlideTime] = useState(1);
 
-  //const previousActions = useSelector((state) => state.previousActions);
   const dispatch = useDispatch();
 
+  const handleDragStart = (e, actionType) => {
+    e.dataTransfer.setData("actionType", actionType);
+    if (actionType === 'move') {
+      e.dataTransfer.setData("value", moveSteps);
+    } else if (actionType === 'turnLeft') {
+      e.dataTransfer.setData("value", undoSteps);
+    } else if (actionType === 'turnRight') {
+      e.dataTransfer.setData("value", redoSteps);
+    } else if (actionType === 'glide') {
+      e.dataTransfer.setData("value", glideTime);
+    }
+    console.log(`Drag started with action type: ${actionType} and value: ${e.dataTransfer.getData("value")}`);
+  };
   const handleClick = () => {
     dispatch(QueueAction("ENQUEUE", `move_right ${moveSteps}`));
     moveSprite(moveSteps);
@@ -137,7 +142,9 @@ const MotionSection = () => {
     <Fragment>
       <div className="font-bold"> {"Motion"} </div>
       <div
-        className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        className="action-block flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'move')}
         onClick={handleClick}
         id={"character0"}
       >
@@ -145,7 +152,7 @@ const MotionSection = () => {
         <div className="">
           <input
             value={moveSteps}
-            onChange={(e) => handleMoveSteps(e)}
+            onChange={(e) => setMoveSteps(e.target.value)}
             onClick={(e) => e.stopPropagation()}
             className="text-black w-8 text-center mx-2 border border-white bg-white rounded-full"
           />
@@ -153,7 +160,9 @@ const MotionSection = () => {
         <span>{"steps"}</span>
       </div>
       <div
-        className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        className="action-block flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'turnLeft')}
         onClick={handleUndoClick}
       >
         <span>{"Turn"}</span>
@@ -169,7 +178,9 @@ const MotionSection = () => {
         <span>{"degrees"}</span>
       </div>
       <div
-        className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        className="action-block flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'turnRight')}
         onClick={handleRedoClick}
       >
         <span>{"Turn"}</span>
@@ -185,19 +196,19 @@ const MotionSection = () => {
         <span>{"degrees"}</span>
       </div>
       <div
-        className="flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        className="action-block flex flex-row flex-wrap bg-blue-500 text-white px-2 py-1 my-2 cursor-pointer rounded items-center text-xs"
+        draggable
+        onDragStart={(e) => handleDragStart(e, 'glide')}
         onClick={handleGlide}
       >
         <span>{"Glide"}</span>
         <input
           value={glideTime}
-          onChange={handleGlideTimeChange}
+          onChange={(e) => setGlideTime(e.target.value)}
           onClick={(e) => e.stopPropagation()}
           className="text-black w-8 text-center mx-2 border border-white bg-white rounded-full"
         />
         <span>{"secs to random position"}</span>
-        <span>
-        </span>
       </div>
     </Fragment>
   );

@@ -8,13 +8,12 @@ import {
 import {
   hideSprite,
   showSprite,
-  saySprite,
-  changeSpriteSize
+  showMessageBubble
 } from "../SideBar/LooksSection/LookSection";
 import QueueAction from "../actions";
 import Icon from "../Icon";
 
-const handleActionReplay = (command) => {
+const handleActionReplay = (command, dispatch) => {
   const actionName = command.split(" ")[0];
   const actionValue = command.split(" ")[1];
   switch (actionName) {
@@ -37,8 +36,9 @@ const handleActionReplay = (command) => {
     case "show":
       showSprite();
       break;
-    case "changesize":
-      changeSpriteSize(actionValue);
+    case "say":
+      const arg = actionValue.split("_");
+      showMessageBubble(Number(arg[0]), Number(arg[1]), dispatch);
       break;
   }
 };
@@ -67,7 +67,7 @@ const Replay = () => {
 
   const performAction = (command) => {
     console.log("action to perform: ", command);
-    handleActionReplay(command);
+    handleActionReplay(command, dispatch);
   }
 
   return (
