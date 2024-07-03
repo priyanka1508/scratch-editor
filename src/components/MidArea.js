@@ -17,10 +17,13 @@ const MidArea = () => {
     e.preventDefault();
     const actionType = e.dataTransfer.getData("actionType");
     const value = e.dataTransfer.getData("value");
+    const originalSection = e.dataTransfer.getData("originalSection");
     const x = e.clientX - e.target.getBoundingClientRect().left;
     const y = e.clientY - e.target.getBoundingClientRect().top;
 
-    setDroppedElements((prev) => [...prev, { actionType, value, x, y }]);
+    if (originalSection !== "midArea") {
+      setDroppedElements((prev) => [...prev, { actionType, value, x, y, originalSection: "midArea" }]);
+    }
   };
 
   const handleDragOver = (e) => {
@@ -40,22 +43,15 @@ const MidArea = () => {
     } else if (actionType === "show") {
       showSprite();
       dispatch(QueueAction("ENQUEUE", `show`));
-    } 
-    else if (actionType === "hide") {
+    } else if (actionType === "hide") {
       hideSprite();
       dispatch(QueueAction("ENQUEUE", `hide`));
-    }
-    else if (actionType === "glide") {
+    } else if (actionType === "glide") {
       glideSprite(Number(value));
-      dispatch(
-        QueueAction(
-          "ENQUEUE",
-          `glide ${value}`
-        )
-      );
+      dispatch(QueueAction("ENQUEUE", `glide ${value}`));
     } else if (actionType === "say") {
       const arg = value.split("_");
-      showMessageBubble(!Boolean(arg[1]), arg[0],Number(arg[2]), dispatch);
+      showMessageBubble(!Boolean(arg[1]), arg[0], Number(arg[2]), dispatch);
       dispatch(QueueAction("ENQUEUE", `say ${value}`));
     }
   };
@@ -80,9 +76,8 @@ const MidArea = () => {
   const renderInputElement = (elem, index, elemIndex) => {
     const allSplitArgs = elem.value.split("_");
     const value = elem.value.split("_")[index];
-    if(elem.actionType === "say" && index == 0) {
-        dispatch(QueueAction("SET_MESSAGE", value));
-        // setMessage(e.target.value);
+    if (elem.actionType === "say" && index === 0) {
+      dispatch(QueueAction("SET_MESSAGE", value));
     }
     return (
       value !== "null" && (
@@ -102,6 +97,12 @@ const MidArea = () => {
     setDroppedElements([]);
   };
 
+  const handleRun = () => {
+    droppedElements.forEach((elem) => {
+      handleElementClick(elem.actionType, elem.value);
+    });
+  };
+
   return (
     <div className="relative h-full w-full">
       <div
@@ -118,6 +119,13 @@ const MidArea = () => {
               top: elem.y,
               left: elem.x,
               width: "fit-content",
+            }}
+            draggable
+            onDragStart={(e) => {
+              e.dataTransfer.setData("actionType", elem.actionType);
+              e.dataTransfer.setData("value", elem.value);
+              e.dataTransfer.setData("originalSection", "midArea");
+              e.dataTransfer.setData("index", elemIndex);
             }}
             onClick={() => handleElementClick(elem.actionType, elem.value)}
           >
@@ -137,9 +145,7 @@ const MidArea = () => {
             )}
             {renderInputElement(elem, 0, elemIndex)}
             {elem.actionType === "move" && <span>steps</span>}
-            {elem.actionType === "glide" && (
-              <span>secs to random position</span>
-            )}
+            {elem.actionType === "glide" && <span>secs to random position</span>}
             {elem.actionType.includes("turn") && <span>degrees</span>}
             {elem.actionType === "say" && (
               <div className="flex flex-row justify-evenly">
@@ -151,6 +157,12 @@ const MidArea = () => {
           </div>
         ))}
       </div>
+      <button
+        onClick={handleRun}
+        className="absolute bottom-16 mb-8 right-4 p-2 bg-green-500 text-white rounded"
+      >
+        Run
+      </button>
       <button
         onClick={handleReset}
         className="absolute bottom-4 mb-8 right-4 p-2 bg-red-500 text-white rounded"
